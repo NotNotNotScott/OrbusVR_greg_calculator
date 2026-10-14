@@ -13,13 +13,11 @@ This program simulates the attack patterns done of multiple classes in the game 
 
 ## Code structure
 
-`index.js` loads the RequireJS modules and supplies their runtime dependencies:
+`index.js` remains the entry point. Supporting JavaScript lives under `js/`:
 
-- `AttackPatternParser.js` parses attack strings and exports the cloning helper used by class hooks.
-- `FightSimulator.js` imports the parser and attack constructor. Each simulator owns its calculation state and exposes results through `getResults()`.
-- `CalculationUI.js` imports the simulator's constants and accepts a simulator instance, chart references, settings reader, and duration formatter.
-- `TilesetOptimizer.js` accepts simulator and UI instances plus the combination and time helpers.
-
-The existing loadout settings and chart globals are connected to these interfaces in `index.js`. The four modules do not share mutable globals with each other.
-
-Run the module integration checks with `node tests/module-dependencies.test.cjs`. They exercise the real class modules and built-in loadouts using a simulated browser interface.
+- `simulation/` - attack-pattern parsing and fight simulation.
+- `optimization/` - tileset searches and refinement.
+- `ui/` - chart initialization and calculation displays.
+- `config/` - loadout data and game constants.
+- `utils/` - combination and time helpers.
+- `classes/` - class-specific attacks and data.

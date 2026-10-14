@@ -1,4 +1,4 @@
-define(["./Shaman", "../AttackPatternParser"], function (Shaman, AttackPatternParser) {
+define(["./Shaman", "../simulation/AttackPatternParser"], function (Shaman, AttackPatternParser) {
 return {
 	getData: function(){
 		var shaman = new Shaman.Shaman({

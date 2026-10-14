@@ -1,4 +1,4 @@
-define(["./FightSimulator"], function(FightSimulator){
+define(["../simulation/FightSimulator"], function(FightSimulator){
 	const {MAX_TIME_SECONDS, STEP_SIZE, MINIMUM_TILESET_LENGTH, MAX_AVAILABLE_TILESETS, START_DRAWING_AFTER_X_SECONDS} = FightSimulator.constants;
 
 	function createAxisLabels(){

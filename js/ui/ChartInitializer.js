@@ -1,4 +1,4 @@
-define(["./classes/Attack", "./classes/RangerData","./classes/ScoundrelData","./classes/ShamanData","./classes/MageData"], 
+define(["../classes/Attack", "../classes/RangerData","../classes/ScoundrelData","../classes/ShamanData","../classes/MageData"], 
 function (Attack, RangerData, ScoundrelData, ShamanData, MageData) {
 return{
 	initializeAllClassData: function(labelsAxisX){

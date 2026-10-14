@@ -1,4 +1,4 @@
-define(["./AttackPatternParser", "./classes/Attack"], function(AttackPatternParser, AttackModule){
+define(["./AttackPatternParser", "../classes/Attack"], function(AttackPatternParser, AttackModule){
 	// Fight simulation, timing constants, and accumulated calculation results.
 
 	const MAX_TIME_SECONDS = 230;

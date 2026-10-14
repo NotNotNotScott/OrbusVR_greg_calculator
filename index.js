@@ -1,5 +1,5 @@
 // Composition root: load modules, supply application input, and wire the interface.
-require(["./FightSimulator", "./CalculationUI", "./TilesetOptimizer", "./ChartInitializer"],
+require(["./js/simulation/FightSimulator", "./js/ui/CalculationUI", "./js/optimization/TilesetOptimizer", "./js/ui/ChartInitializer"],
 function(FightSimulator, CalculationUI, TilesetOptimizer, ChartInitializer){
 	function readSettings(){
 		return {

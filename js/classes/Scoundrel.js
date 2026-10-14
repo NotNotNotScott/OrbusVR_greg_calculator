@@ -1,4 +1,4 @@
-define(["./Attack", "../AttackPatternParser"], function (Attack, AttackPatternParser) {
+define(["./Attack", "../simulation/AttackPatternParser"], function (Attack, AttackPatternParser) {
 const SINGLE_RANK_MULT = 0.1436;
 const SCOUNDREL_CARD_HUMAN_THINKING_TIME = 0.3;
 const Data = {

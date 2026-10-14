@@ -8,6 +8,17 @@ const root = path.resolve(__dirname, '..');
 const comparisonIndex = process.argv.indexOf('--compare-before');
 const comparisonRoot = comparisonIndex === -1 ? null : path.resolve(process.argv[comparisonIndex + 1]);
 
+const historicalPaths = {
+  'AttackPatternParser.js': 'js/simulation/AttackPatternParser.js',
+  'FightSimulator.js': 'js/simulation/FightSimulator.js',
+  'TilesetOptimizer.js': 'js/optimization/TilesetOptimizer.js',
+  'CalculationUI.js': 'js/ui/CalculationUI.js',
+  'ChartInitializer.js': 'js/ui/ChartInitializer.js',
+  'loadConstants.js': 'js/config/loadConstants.js',
+  'loadouts.js': 'js/config/loadouts.js',
+  'Tools.js': 'js/utils/Tools.js',
+};
+
 function createBrowser(seed, beforeRoot) {
   const elements = {}, timers = new Map(), charts = [], drawCalls = [], logs = [], modules = {}, instances = {};
   let nextTimer = 1, clock = 0, loadingFile = '';
@@ -59,7 +70,7 @@ function createBrowser(seed, beforeRoot) {
   const run = code => vm.runInContext(code, sandbox);
   function read(file) {
     const oldPath = beforeRoot && path.join(beforeRoot, file);
-    return fs.readFileSync(oldPath && fs.existsSync(oldPath) ? oldPath : path.join(root, file), 'utf8');
+    return fs.readFileSync(oldPath && fs.existsSync(oldPath) ? oldPath : path.join(root, historicalPaths[file] || (file.startsWith('classes/') ? 'js/' + file : file)), 'utf8');
   }
   function load(file) {
     if (modules[file]) return modules[file];
@@ -79,9 +90,8 @@ function createBrowser(seed, beforeRoot) {
   sandbox.require = (deps, callback) => callback(...deps.map(dep => load(path.posix.normalize(dep) + '.js')));
   run('Math.random=function(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};');
   sandbox.tick = () => ++clock; run('Date.now=tick;');
-  for (const file of ['Tools.js', 'loadConstants.js', 'loadouts.js']) load(file);
-  if (beforeRoot) for (const file of ['AttackPatternParser.js', 'FightSimulator.js', 'TilesetOptimizer.js', 'CalculationUI.js']) load(file);
-  load('index.js');
+  const scriptFiles = [...read('index.html').matchAll(/<script[^>]*src="([^"]+)"/g)].map(match => match[1]);
+  for (const file of scriptFiles.filter(file => !file.startsWith('libs/'))) load(file);
   function flush() {
     let count = 0;
     while (timers.size) {
@@ -93,9 +103,9 @@ function createBrowser(seed, beforeRoot) {
     sandbox.result = result;
     const results = beforeRoot
       ? JSON.parse(run('JSON.stringify({totalDamageDataPoints,minMaxData:typeof minMaxData === "undefined" ? undefined : minMaxData,minTriggeredTiles:minStringStoringAllTiles,maxTriggeredTiles:maxStringStoringAllTiles})'))
-      : instances['FightSimulator.js'].getResults();
+      : instances['js/simulation/FightSimulator.js'].getResults();
     return JSON.stringify({ result: JSON.parse(run('JSON.stringify({result,seed})')), results,
-      tilesetState: beforeRoot ? run('tilesetState') : instances['CalculationUI.js'].getTilesetPromptState(),
+      tilesetState: beforeRoot ? run('tilesetState') : instances['js/ui/CalculationUI.js'].getTilesetPromptState(),
       charts: charts.map(chart => ({data: chart.data, updates: chart.updates})), elements, drawCalls, logs, timers: [...timers.values()].map(timer => timer.delay) });
   }
   return { run, flush, snapshot, modules, instances, element, click: id => element(id).events.click(), sandbox };
@@ -111,7 +121,7 @@ for (const seed of [1, 42, 987654321]) {
   compare('startup');
   current.flush(); before?.flush(); compare('initial calculation');
   assert.equal(current.element('loadingText').style.visibility, 'collapse');
-  assert.ok(current.instances['FightSimulator.js'].getResults().minMaxData.highestTotal > 0);
+  assert.ok(current.instances['js/simulation/FightSimulator.js'].getResults().minMaxData.highestTotal > 0);
   for (const name of ['doAllCalculations', 'getAttackPatterns', 'clone', 'chartFilling', 'tilesetState', 'totalDamageDataPoints', 'minMaxData', 'labelsAxisX', 'MAX_TIME_SECONDS']) {
     assert.equal(current.run('typeof ' + name), 'undefined', name + ' must remain private');
   }
@@ -119,13 +129,13 @@ for (const seed of [1, 42, 987654321]) {
   for (const [className, loadoutName] of loadouts) {
     const setup = `$('#classData').val(${JSON.stringify(className)});localStorage[loadoutsKey]=JSON.stringify(res);injectLoadout(${JSON.stringify(loadoutName)});`;
     current.run(setup); before?.run(setup);
-    const result = current.instances['FightSimulator.js'].doAllCalculations(current.instances['CalculationUI.js'].retreiveCurrentInterfaceTilesets(), 3);
+    const result = current.instances['js/simulation/FightSimulator.js'].doAllCalculations(current.instances['js/ui/CalculationUI.js'].retreiveCurrentInterfaceTilesets(), 3);
     const oldResult = before?.run('doAllCalculations(retreiveCurrentInterfaceTilesets(),3)');
     assert.ok(result.dps > 0, className + ': ' + loadoutName);
     compare(className + ': ' + loadoutName, result, oldResult);
   }
   current.run("$('#calcCount').val(3);"); before?.run("$('#calcCount').val(3);");
-  current.instances['CalculationUI.js'].calculateFightAndPopulateUI(); before?.run('calculateFightAndPopulateUI();');
+  current.instances['js/ui/CalculationUI.js'].calculateFightAndPopulateUI(); before?.run('calculateFightAndPopulateUI();');
   current.flush(); before?.flush(); compare('manual calculation');
   for (const id of ['openFindBestTilesetButton', 'closeFindTilesetButton', 'resetTilesetsButton', 'startFindingTheBestTilesetCombinations']) {
     current.click(id); before?.click(id); compare(id);
@@ -135,7 +145,7 @@ for (const seed of [1, 42, 987654321]) {
   for (const id of ['checkTilesetsButton', 'startFindingTheBestTilesetCombinations', 'checkTilesetsButton', 'startFindingTheBestTilesetCombinations']) {
     current.click(id); before?.click(id); compare('search/refinement ' + id);
   }
-  assert.equal(current.instances['CalculationUI.js'].getTilesetPromptState(), 2);
+  assert.equal(current.instances['js/ui/CalculationUI.js'].getTilesetPromptState(), 2);
   assert.ok(current.element('bestResultTilesetsJson').children.length > 0);
   current.run("$('#recalculateTopTileset').val(0);"); before?.run("$('#recalculateTopTileset').val(0);");
   current.click('checkTilesetsButton'); before?.click('checkTilesetsButton'); compare('empty refinement');
@@ -149,10 +159,10 @@ for (const seed of [1, 42, 987654321]) {
   current.click('checkTilesetsButton'); before?.click('checkTilesetsButton'); compare('too many possible tiles');
   assert.match(current.element('tilesetsStatusMsg').innerHTML, /max allowed/);
   // Creating a second simulator must not overwrite the first instance's accumulated results.
-  const firstSimulator = current.instances['FightSimulator.js'];
+  const firstSimulator = current.instances['js/simulation/FightSimulator.js'];
   const firstResults = JSON.stringify(firstSimulator.getResults());
   const settings = { tilesetsEnabled: false, critChance: 0, critDamage: 1.5, critMultiplier: 1, weaponAffixBoosts: 1, weaponLevel: 30, weaponPlusLevel: 0 };
-  const isolated = current.modules['FightSimulator.js'].create({
+  const isolated = current.modules['js/simulation/FightSimulator.js'].create({
     readInput: () => ({ className: 'fixture', attackPattern: '', settings }),
     loadAttacksOfClass: (name, data) => { data.classData = { attackTypes: {} }; }, hitChartData: { min: {}, max: {} },
   });
