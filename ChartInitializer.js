@@ -1,7 +1,7 @@
 define(["./classes/Attack", "./classes/RangerData","./classes/ScoundrelData","./classes/ShamanData","./classes/MageData"], 
 function (Attack, RangerData, ScoundrelData, ShamanData, MageData) {
 return{
-	initializeAllClassData: function(){
+	initializeAllClassData: function(labelsAxisX){
 		// Set the classes in the UI.
 		var classOptions = document.getElementById('classData');
 		for (i=1; i<= CONST_CLASSES.length; i++) {
@@ -15,13 +15,13 @@ return{
 
 		// Pre init the chart data.
 		if(dpsChart == undefined){
-			dpsChart = this.initDpsChart('line_chart');
+			dpsChart = this.initDpsChart('line_chart', labelsAxisX);
 		}
 		if(minDpsChart == undefined) {
-			minDpsChart = this.initDpsChart('min_line_chart');
+			minDpsChart = this.initDpsChart('min_line_chart', labelsAxisX);
 		}
 		if(maxDpsChart == undefined) {
-			maxDpsChart = this.initDpsChart('max_line_chart');
+			maxDpsChart = this.initDpsChart('max_line_chart', labelsAxisX);
 		}
 		if(minHitChart == undefined){
 			minHitChart = this.initHitChart('min_hit_chart');
@@ -33,7 +33,7 @@ return{
 		}
 	},
 
-	initDpsChart: function(elementId) {
+	initDpsChart: function(elementId, labelsAxisX) {
 		let dpsChart = new Chart(document.getElementById(elementId), {
 			type: 'line',
 			data: undefined,

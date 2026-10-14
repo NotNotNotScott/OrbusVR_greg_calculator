@@ -42,23 +42,6 @@ const BLEED_ACTUAL_DMG_INC = BLEED_DEFAULT_DMG_INC*BLEED_CHANCE_PERCENT;
 const BASE_BASE_CRIT_CHANCE = 0.1;
 const BASE_BASE_CRIT_AMOUNT = 1.5;
 
-$("#togglePots").click(function(){
-	if(chartFilling == false){
-		globalUsingPotsFlag = !globalUsingPotsFlag;
-		updatePotsHtml(globalUsingPotsFlag);
-		refreshLoadout();
-		loadAllCharts();
-	}
-});
-
-$("#toggleTilesets").click(function(){
-	if(chartFilling == false){
-		globalTilesetsEnabledFlag = !globalTilesetsEnabledFlag;
-		updateTilesets(globalTilesetsEnabledFlag);
-		loadAllCharts();
-	}
-});
-
 function updatePotsHtml(usingPotsFlag){
 	if(usingPotsFlag == false){
 		$("#togglePots").html('Enable pots');

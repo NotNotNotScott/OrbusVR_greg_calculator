@@ -1,4 +1,4 @@
-define(["./Shaman"], function (Shaman) {
+define(["./Shaman", "../AttackPatternParser"], function (Shaman, AttackPatternParser) {
 return {
 	getData: function(){
 		var shaman = new Shaman.Shaman({
@@ -29,7 +29,7 @@ return {
 
 		function lightningSpawnMoreAttacks(attack, targetPatternData, graphSpecificData, timePassed) {
 			if(attack.isCritting) {
-				var newAttack = clone(NEW_SPAWNED_LIGHTNING);
+				var newAttack = AttackPatternParser.clone(NEW_SPAWNED_LIGHTNING);
 				targetPatternData.pattern.splice(targetPatternData.patternIdx+1, 0, newAttack);
 			}
 			return 1;

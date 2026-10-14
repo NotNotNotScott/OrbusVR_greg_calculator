@@ -1,4 +1,4 @@
-define(["./Attack"], function (Attack) {
+define(["./Attack", "../AttackPatternParser"], function (Attack, AttackPatternParser) {
 const SINGLE_RANK_MULT = 0.1436;
 const SCOUNDREL_CARD_HUMAN_THINKING_TIME = 0.3;
 const Data = {
@@ -323,7 +323,7 @@ return {
 
 				// Add a new poison DoT right after the attack with the poison card.
 				if(calcData.shootCard == CARD_POISON){
-					var newAttack = clone(SCOUNDREL_NEW_SPAWNED_POISON);
+					var newAttack = AttackPatternParser.clone(SCOUNDREL_NEW_SPAWNED_POISON);
 					if(calcData.burnEffect == EFFECT_BOOST){
 						newAttack.dotTimes = Data.POISON_EXTENDED_DOT_COUNT;
 					} else{
@@ -336,11 +336,11 @@ return {
 				else if(calcData.shootCard == CARD_FLAME){
 					boost += Data.FLAME_CARD_MULTIPLIER; // Increase total damage from flame itself.
 					SCOUNDREL_NEW_SPAWNED_CARD.tiles = Data.TILES.FLAME_CARD;
-					var newAttack = clone(SCOUNDREL_NEW_SPAWNED_CARD);
+					var newAttack = AttackPatternParser.clone(SCOUNDREL_NEW_SPAWNED_CARD);
 					targetPatternData.pattern.splice(targetPatternData.patternIdx+1, 0, newAttack);
 				} else if(calcData.shootCard == CARD_HEAL){
 					SCOUNDREL_NEW_SPAWNED_CARD.tiles = DATA.TILES.LIGHT_CARD;
-					var newAttack = clone(SCOUNDREL_NEW_SPAWNED_CARD);
+					var newAttack = AttackPatternParser.clone(SCOUNDREL_NEW_SPAWNED_CARD);
 					targetPatternData.pattern.splice(targetPatternData.patternIdx+1, 0, newAttack);
 				}
 				calcData.burnEffect = EFFECT_NONE;
